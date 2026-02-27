@@ -3,100 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW EMPIRE | ITZBIC</title>
+    <title>SHΔDØW | Glass Edition</title>
+    
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <style>
-        :root { --p: #ff0050; --s: #00f2ea; }
-        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
-        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+            --neon-p: #ff0050;
+            --neon-s: #00f2ea;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background: #050505;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Animated Background */
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
+            z-index: -1;
+        }
+
+        /* Feed Container */
+        #feed {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
         #feed::-webkit-scrollbar { display: none; }
-        .v-card { height: 100vh; width: 100%; scroll-snap-align: start; display: flex; justify-content: center; position: relative; background: #000; border-bottom: 1px solid #111; }
-        video { height: 100%; width: 100%; object-fit: cover; max-width: 500px; }
-        .logo { position: fixed; top: 20px; right: 20px; z-index: 1000; font-weight: bold; font-size: 24px; cursor: pointer; color: var(--p); text-shadow: 0 0 10px var(--p); }
-        .overlay { position: absolute; bottom: 50px; left: 20px; z-index: 10; text-shadow: 2px 2px 5px #000; }
-        #admin { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .box { background: #111; padding: 30px; border-radius: 15px; border: 1px solid var(--s); text-align: center; width: 85%; max-width: 350px; }
-        button { width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 5px; border: none; }
+
+        .v-card {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        video {
+            height: 92vh;
+            width: 95%;
+            max-width: 450px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* Glass Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, var(--neon-p), var(--neon-s));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        /* Glass Overlay */
+        .info-glass {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 350px;
+            padding: 15px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        /* Admin Panel */
+        #admin {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .glass-box {
+            background: var(--glass);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            width: 85%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,242,234,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--neon-s);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+        }
+
+        .btn-glass {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--neon-p), var(--neon-s));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-glass:hover { opacity: 0.8; transform: scale(1.02); }
     </style>
 </head>
 <body>
 
-    <div class="logo" id="gate">SHΔDØW.EXE</div>
+    <div class="bg-glow"></div>
+
+    <div class="header">
+        <div class="logo" id="sh-trigger">SHΔDØW.EXE</div>
+        <div style="font-size: 12px; opacity: 0.6;">ITZBIC SERIES</div>
+    </div>
+
     <div id="feed"></div>
 
     <div id="admin">
-        <div class="box">
-            <h2 style="color:var(--s)">Control Panel</h2>
-            <input type="password" id="pass" placeholder="Password" style="width:90%; padding:10px; margin-bottom:10px; text-align:center;">
-            <button onclick="login()" style="background:var(--p); color:#fff;">Access</button>
-            <div id="tools" style="display:none; margin-top:20px;">
-                <button id="up" style="background:var(--s); color:#000;">Upload New Video 🔥</button>
+        <div class="glass-box">
+            <h2 style="color: var(--neon-s)">CORE ACCESS</h2>
+            <input type="password" id="pass" placeholder="Enter Encryption Key">
+            <button class="btn-glass" onclick="login()">INITIALIZE</button>
+            <div id="tools" style="display:none; margin-top:30px;">
+                <button id="up" class="btn-glass" style="background: var(--neon-s); color: black;">UPLOAD NEW DATA</button>
             </div>
-            <p onclick="document.getElementById('admin').style.display='none'" style="color:#555; cursor:pointer; margin-top:15px;">Close</p>
+            <p onclick="document.getElementById('admin').style.display='none'" style="margin-top:20px; cursor:pointer; font-size:12px; color:#888;">TERMINATE SESSION</p>
         </div>
     </div>
 
     <script>
         const cloudName = "dssk5tabb";
-        // مصفوفة الفيديوهات الحالية التي طلبتها
-        const itzbicVideos = [
-            "010_Itzbic", "09_Itzbic", "08_Itzbic", "07_Itzbic", 
-            "06_Itzbic", "05_Itzbic", "04_Itzbic", "03_Itzbic", 
-            "02_Itzbic", "01_Itzbic"
-        ];
-
+        const itzbicVideos = ["010_Itzbic", "09_Itzbic", "08_Itzbic", "07_Itzbic", "06_Itzbic", "05_Itzbic", "04_Itzbic", "03_Itzbic", "02_Itzbic", "01_Itzbic"];
+        
         const conf = { databaseURL: "https://porn-dc411-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(conf);
         const db = firebase.database();
 
-        function createCard(url, title) {
+        function createCard(url, user) {
             const card = document.createElement('div');
             card.className = 'v-card';
             card.innerHTML = `
                 <video loop playsinline onclick="this.paused?this.play():this.pause()">
                     <source src="${url}" type="video/mp4">
                 </video>
-                <div class="overlay"><h3>@${title}</h3></div>
+                <div class="info-glass">
+                    <div style="font-weight:bold; color:var(--neon-s)">@${user}</div>
+                    <div style="font-size:12px; opacity:0.7">Encrypted Stream</div>
+                </div>
             `;
             return card;
         }
 
-        // جلب الفيديوهات من السحابة + قاعدة البيانات
         db.ref('videos').on('value', (s) => {
-            const f = document.getElementById('feed');
-            f.innerHTML = '';
-            
-            // 1. إضافة الفيديوهات الجديدة من Firebase أولاً
+            const f = document.getElementById('feed'); f.innerHTML = '';
             const data = s.val();
-            if(data) {
-                Object.values(data).reverse().forEach(v => {
-                    f.appendChild(createCard(v.url, "New_Feed"));
-                });
-            }
-
-            // 2. إضافة الفيديوهات العشرة الأساسية (Itzbic)
+            if(data) Object.values(data).reverse().forEach(v => f.appendChild(createCard(v.url, "Cloud_User")));
             itzbicVideos.forEach(name => {
-                const url = `https://res.cloudinary.com/${cloudName}/video/upload/${name}.mp4`;
-                f.appendChild(createCard(url, name));
+                f.appendChild(createCard(`https://res.cloudinary.com/${cloudName}/video/upload/${name}.mp4`, name));
             });
-            
             obs();
         });
 
-        // نظام الرفع
         var w = cloudinary.createUploadWidget({ cloudName: cloudName, uploadPreset: "ml_default" }, (err, res) => {
             if (!err && res && res.event === "success") {
                 db.ref('videos').push({ url: res.info.secure_url });
-                alert("Deployed to Universe!");
+                alert("Data Synced!");
             }
         });
         document.getElementById("up").onclick = () => w.open();
 
-        // دخول الإدارة (ضغط 3 ثوانٍ)
         let t;
-        const gate = document.getElementById("gate");
+        const gate = document.getElementById("sh-trigger");
         gate.onmousedown = gate.ontouchstart = () => t = setTimeout(() => document.getElementById('admin').style.display='flex', 3000);
         gate.onmouseup = gate.ontouchend = () => clearTimeout(t);
 
