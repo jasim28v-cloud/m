@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW EMPIRE</title>
+    <title>SHADOW EMPIRE | ITZBIC</title>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
         :root { --p: #ff0050; --s: #00f2ea; }
         body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
-        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .v-card { height: 100vh; width: 100%; scroll-snap-align: start; display: flex; justify-content: center; position: relative; background: #000; }
+        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #feed::-webkit-scrollbar { display: none; }
+        .v-card { height: 100vh; width: 100%; scroll-snap-align: start; display: flex; justify-content: center; position: relative; background: #000; border-bottom: 1px solid #111; }
         video { height: 100%; width: 100%; object-fit: cover; max-width: 500px; }
         .logo { position: fixed; top: 20px; right: 20px; z-index: 1000; font-weight: bold; font-size: 24px; cursor: pointer; color: var(--p); text-shadow: 0 0 10px var(--p); }
+        .overlay { position: absolute; bottom: 50px; left: 20px; z-index: 10; text-shadow: 2px 2px 5px #000; }
         #admin { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .box { background: #111; padding: 30px; border-radius: 15px; border: 1px solid var(--s); text-align: center; width: 80%; }
+        .box { background: #111; padding: 30px; border-radius: 15px; border: 1px solid var(--s); text-align: center; width: 85%; max-width: 350px; }
         button { width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 5px; border: none; }
     </style>
 </head>
@@ -26,54 +28,87 @@
 
     <div id="admin">
         <div class="box">
-            <h2 style="color:var(--s)">Admin Panel</h2>
-            <input type="password" id="pass" placeholder="Password" style="width:90%; padding:10px; margin-bottom:10px;">
-            <button onclick="login()" style="background:var(--p); color:#fff;">Login</button>
+            <h2 style="color:var(--s)">Control Panel</h2>
+            <input type="password" id="pass" placeholder="Password" style="width:90%; padding:10px; margin-bottom:10px; text-align:center;">
+            <button onclick="login()" style="background:var(--p); color:#fff;">Access</button>
             <div id="tools" style="display:none; margin-top:20px;">
-                <button id="up" style="background:var(--s); color:#000;">Upload Video 🔥</button>
+                <button id="up" style="background:var(--s); color:#000;">Upload New Video 🔥</button>
             </div>
-            <p onclick="document.getElementById('admin').style.display='none'" style="color:#555; cursor:pointer; margin-top:10px;">Close</p>
+            <p onclick="document.getElementById('admin').style.display='none'" style="color:#555; cursor:pointer; margin-top:15px;">Close</p>
         </div>
     </div>
 
     <script>
-        // --- IMPORTANT: Paste your Firebase Link below ---
+        const cloudName = "dssk5tabb";
+        // مصفوفة الفيديوهات الحالية التي طلبتها
+        const itzbicVideos = [
+            "010_Itzbic", "09_Itzbic", "08_Itzbic", "07_Itzbic", 
+            "06_Itzbic", "05_Itzbic", "04_Itzbic", "03_Itzbic", 
+            "02_Itzbic", "01_Itzbic"
+        ];
+
         const conf = { databaseURL: "https://porn-dc411-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(conf);
         const db = firebase.database();
 
-        // Load Videos
+        function createCard(url, title) {
+            const card = document.createElement('div');
+            card.className = 'v-card';
+            card.innerHTML = `
+                <video loop playsinline onclick="this.paused?this.play():this.pause()">
+                    <source src="${url}" type="video/mp4">
+                </video>
+                <div class="overlay"><h3>@${title}</h3></div>
+            `;
+            return card;
+        }
+
+        // جلب الفيديوهات من السحابة + قاعدة البيانات
         db.ref('videos').on('value', (s) => {
-            const f = document.getElementById('feed'); f.innerHTML = '';
+            const f = document.getElementById('feed');
+            f.innerHTML = '';
+            
+            // 1. إضافة الفيديوهات الجديدة من Firebase أولاً
             const data = s.val();
-            for(let id in data) {
-                const v = data[id];
-                const card = document.createElement('div'); card.className = 'v-card';
-                card.innerHTML = `<video loop playsinline onclick="this.paused?this.play():this.pause()"><source src="${v.url}" type="video/mp4"></video>`;
-                f.prepend(card);
+            if(data) {
+                Object.values(data).reverse().forEach(v => {
+                    f.appendChild(createCard(v.url, "New_Feed"));
+                });
             }
+
+            // 2. إضافة الفيديوهات العشرة الأساسية (Itzbic)
+            itzbicVideos.forEach(name => {
+                const url = `https://res.cloudinary.com/${cloudName}/video/upload/${name}.mp4`;
+                f.appendChild(createCard(url, name));
+            });
+            
             obs();
         });
 
-        // Upload Logic
-        var w = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "ml_default" }, (err, res) => {
+        // نظام الرفع
+        var w = cloudinary.createUploadWidget({ cloudName: cloudName, uploadPreset: "ml_default" }, (err, res) => {
             if (!err && res && res.event === "success") {
                 db.ref('videos').push({ url: res.info.secure_url });
-                alert("Success!");
+                alert("Deployed to Universe!");
             }
         });
         document.getElementById("up").onclick = () => w.open();
 
-        // Secret Access (Long Press 3s)
+        // دخول الإدارة (ضغط 3 ثوانٍ)
         let t;
-        const btn = document.getElementById("gate");
-        btn.onmousedown = btn.ontouchstart = () => t = setTimeout(() => document.getElementById('admin').style.display='flex', 3000);
-        btn.onmouseup = btn.ontouchend = () => clearTimeout(t);
+        const gate = document.getElementById("gate");
+        gate.onmousedown = gate.ontouchstart = () => t = setTimeout(() => document.getElementById('admin').style.display='flex', 3000);
+        gate.onmouseup = gate.ontouchend = () => clearTimeout(t);
 
         function login() { if(document.getElementById('pass').value === "1234") document.getElementById('tools').style.display='block'; }
 
         function obs() {
-            const o = new IntersectionObserver(es => { es.forEach(e => { const v = e.target.querySelector('video'); if(v) e.isIntersecting ? v.play() : v.pause(); }); }, { threshold: 0.6 });
+            const o = new IntersectionObserver(es => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if(v) e.isIntersecting ? v.play() : v.pause();
+                });
+            }, { threshold: 0.6 });
             document.querySelectorAll('.v-card').forEach(c => o.observe(c));
         }
     </script>
