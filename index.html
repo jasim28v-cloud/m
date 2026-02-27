@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STUDIO HOMEWORK | MODY ARCHIVE</title>
+    <title>STUDIO HOMEWORK | MODY FIX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,76 +11,74 @@
         :root { --neon: #00f3ff; }
         body, html { margin: 0; padding: 0; background: #000; color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; height: 100%; width: 100%; }
         
-        .main-scroller { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; scroll-behavior: smooth; }
+        .main-scroller { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .main-scroller::-webkit-scrollbar { display: none; }
         
-        .video-section { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; }
+        .video-section { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #050505; }
         .video-bg { position: absolute; inset: 0; z-index: 1; }
-        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
+        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6); }
 
         .info-panel { position: absolute; bottom: 10%; left: 5%; z-index: 100; pointer-events: none; }
-        .node-tag { background: rgba(0, 243, 255, 0.1); border-left: 3px solid var(--neon); color: var(--neon); padding: 5px 15px; font-size: 11px; font-family: 'Orbitron'; margin-bottom: 10px; display: inline-block; letter-spacing: 2px; }
-        .main-title { font-family: 'Orbitron'; font-weight: 900; font-size: clamp(2.5rem, 10vw, 6rem); line-height: 0.9; background: linear-gradient(to bottom, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+        .node-tag { background: rgba(0, 243, 255, 0.1); border-left: 3px solid var(--neon); color: var(--neon); padding: 5px 15px; font-size: 11px; font-family: 'Orbitron'; margin-bottom: 10px; display: inline-block; }
+        .main-title { font-family: 'Orbitron'; font-weight: 900; font-size: clamp(2.5rem, 10vw, 6rem); line-height: 0.9; background: linear-gradient(to bottom, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
-        .load-bar { width: 150px; height: 1px; background: rgba(255,255,255,0.1); margin-top: 20px; position: relative; }
-        .load-progress { position: absolute; height: 100%; background: var(--neon); width: 0%; transition: 0.5s; }
-        
+        .load-bar { width: 150px; height: 2px; background: rgba(255,255,255,0.1); margin-top: 15px; position: relative; overflow: hidden; }
+        .load-bar::after { content: ''; position: absolute; width: 40%; height: 100%; background: var(--neon); animation: load 1.2s infinite; }
+        @keyframes load { 0% { left: -40%; } 100% { left: 100%; } }
+
         .side-nav { position: fixed; right: 25px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
-        .nav-btn { width: 45px; height: 45px; border: 1px solid rgba(0, 243, 255, 0.3); background: rgba(0,0,0,0.6); color: var(--neon); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .nav-btn { width: 45px; height: 45px; border: 1px solid var(--neon); background: rgba(0,0,0,0.6); color: var(--neon); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="text-cyan-400 font-black tracking-[10px] text-[10px]" style="font-family: 'Orbitron';">LOADING_MODY_ASSETS</div>
-        <div class="load-bar"><div id="p-bar" class="load-progress"></div></div>
+        <div class="text-cyan-400 font-black tracking-[8px] text-[10px]" style="font-family: 'Orbitron';">CONNECTING_TO_CLOUD</div>
+        <div class="load-bar"></div>
     </div>
 
     <div class="side-nav">
         <button class="nav-btn" onclick="toggleMute()"><i class="fas fa-volume-mute" id="m-icon"></i></button>
-        <button class="nav-btn" onclick="document.querySelector('.main-scroller').scrollBy({top: window.innerHeight, behavior:'smooth'})"><i class="fas fa-chevron-down"></i></button>
+        <button class="nav-btn" onclick="document.querySelector('.main-scroller').scrollBy({top: window.innerHeight, behavior:'smooth'})"><i class="fas fa-arrow-down"></i></button>
     </div>
 
     <header class="fixed top-0 w-full z-[1000] p-8 flex justify-between items-start pointer-events-none">
         <div class="flex items-center gap-4">
-            <div class="w-1 h-12 bg-cyan-400"></div>
+            <div class="w-1 h-12 bg-cyan-400 shadow-[0_0_15px_#00f3ff]"></div>
             <div>
                 <h1 class="text-2xl font-black tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
-                <div class="text-[8px] text-white/30 tracking-[4px]">DATABASE_CONNECTED // 2027</div>
+                <div class="text-[8px] text-white/30 tracking-[4px]">ASSET_STREAMING_ACTIVE</div>
             </div>
         </div>
-        <div class="text-right">
-            <div class="text-cyan-400 text-[10px] font-bold tracking-[2px]">ASSET: <span id="idx">01</span> / 31</div>
-        </div>
+        <div class="text-cyan-400 text-[10px] font-bold">NODE: <span id="idx">01</span> / 31</div>
     </header>
 
     <main class="main-scroller" id="content-engine"></main>
 
     <script>
-        const cloudName = "dssk5tabb";
+        const cloudID = "dssk5tabb";
         const folder = "mody";
         const engine = document.getElementById('content-engine');
-        const totalVideos = 31; // تم التعديل ليعرض 31 فيديو فقط
+        const count = 31;
 
-        for (let i = 1; i <= totalVideos; i++) {
+        for (let i = 1; i <= count; i++) {
             const num = i.toString().padStart(2, '0');
-            const videoID = `${num}_Itzbic`;
+            const videoName = `${num}_Itzbic`;
             
-            // الرابط المحدث والمجرب
-            const videoURL = `https://res.cloudinary.com/${cloudName}/video/upload/q_auto,f_auto/${folder}/${videoID}.mp4`;
+            // جربت هنا الرابط بأبسط صورة ممكنة وبدون ضغط معقد للتأكد من الظهور
+            const videoURL = `https://res.cloudinary.com/${cloudID}/video/upload/${folder}/${videoName}.mp4`;
 
             const section = document.createElement('section');
             section.className = 'video-section';
             section.dataset.n = num;
             section.innerHTML = `
                 <div class="video-bg">
-                    <video loop playsinline muted preload="metadata" src="${videoURL}"></video>
+                    <video loop playsinline muted preload="auto" src="${videoURL}"></video>
                 </div>
                 <div class="info-panel">
-                    <div class="node-tag">Vision Node ${num}</div>
-                    <h2 class="main-title">CINEMATIC<br>PROJECT</h2>
-                    <p class="text-white/20 text-[9px] mt-4 tracking-[3px]">MODY_ARCHIVE // ${videoID}</p>
+                    <div class="node-tag">VISION NODE ${num}</div>
+                    <h2 class="main-title">CINEMATIC<br>STUDIO</h2>
                 </div>
             `;
             engine.appendChild(section);
@@ -90,7 +88,7 @@
             entries.forEach(e => {
                 const v = e.target.querySelector('video');
                 if (e.isIntersecting) {
-                    v.play().catch(() => {});
+                    v.play().catch(err => console.log("Error playing video"));
                     document.getElementById('idx').innerText = e.target.dataset.n;
                 } else {
                     v.pause();
@@ -100,20 +98,19 @@
 
         document.querySelectorAll('.video-section').forEach(s => obs.observe(s));
 
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
+            }, 1000);
+        };
+
         let isMute = true;
         function toggleMute() {
             isMute = !isMute;
             document.querySelectorAll('video').forEach(v => v.muted = isMute);
             document.getElementById('m-icon').className = isMute ? "fas fa-volume-mute" : "fas fa-volume-up";
         }
-
-        window.onload = () => {
-            document.getElementById('p-bar').style.width = '100%';
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
-            }, 1000);
-        };
     </script>
 </body>
 </html>
