@@ -3,55 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STUDIO HOMEWORK | EMPIRE 2027</title>
+    <title>STUDIO HOMEWORK | HYBRID SYSTEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
-        :root { --neon: #00f3ff; --glass: rgba(0, 0, 0, 0.85); }
+        :root { --neon: #00f3ff; }
         body, html { margin: 0; padding: 0; background: #000; color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; height: 100%; width: 100%; }
-        .main-scroller { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; scroll-behavior: smooth; }
+        .main-scroller { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .main-scroller::-webkit-scrollbar { display: none; }
         .video-section { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .video-bg { position: absolute; inset: 0; z-index: 1; }
-        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5) contrast(1.2); transition: 1.5s ease; }
+        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
         .hud-overlay { position: absolute; inset: 30px; border: 1px solid rgba(0, 243, 255, 0.1); pointer-events: none; z-index: 10; border-radius: 25px; }
         .corner { position: absolute; width: 40px; height: 40px; border: 3px solid var(--neon); filter: drop-shadow(0 0 15px var(--neon)); }
         .t-l { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-radius: 20px 0 0 0; }
         .b-r { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-radius: 0 0 20px 0; }
-        .info-panel { position: absolute; bottom: 80px; left: 50px; z-index: 100; max-width: 85%; pointer-events: none; }
-        .node-tag { background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon); color: var(--neon); padding: 5px 15px; font-size: 10px; letter-spacing: 5px; font-family: 'Orbitron'; margin-bottom: 25px; display: inline-block; }
-        .main-title { font-family: 'Orbitron'; font-weight: 900; font-size: clamp(3rem, 12vw, 6.5rem); line-height: 0.8; text-transform: uppercase; letter-spacing: -4px; background: linear-gradient(to right, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .progress-bar { width: 200px; height: 2px; background: rgba(255,255,255,0.1); position: relative; margin-top: 20px; }
-        .progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--neon); animation: sync 2.5s infinite; }
+        .info-panel { position: absolute; bottom: 80px; left: 50px; z-index: 100; }
+        .node-tag { background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon); color: var(--neon); padding: 5px 15px; font-size: 10px; font-family: 'Orbitron'; margin-bottom: 25px; display: inline-block; }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1s; }
         @keyframes sync { 0% { width: 0%; left: 0; } 50% { width: 100%; left: 0; } 100% { width: 0%; left: 100%; } }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="text-cyan-400 font-black tracking-[12px] animate-pulse text-[10px]" style="font-family: 'Orbitron';">SYNCING_FULL_ARCHIVE_2027</div>
-        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <div class="text-cyan-400 font-black tracking-[12px] animate-pulse text-[10px]" style="font-family: 'Orbitron';">SYNC_DATA_E327</div>
+        <div class="w-[200px] h-[2px] bg-white/10 mt-4"><div class="h-full bg-cyan-400 animate-[sync_2.5s_infinite]" style="position:relative"></div></div>
     </div>
 
     <header class="fixed top-0 w-full z-[1000] p-10 flex justify-between items-start pointer-events-none">
-        <div class="flex items-center gap-6">
-            <div class="w-1 h-16 bg-cyan-400 shadow-[0_0_20px_#00f3ff]"></div>
-            <div>
-                <h1 class="font-black text-3xl tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
-                <div id="live-clock" class="text-[9px] text-white/40 tracking-[6px] mt-1">00:00:00 // SECURE_ACCESS</div>
-            </div>
-        </div>
+        <h1 class="font-black text-3xl tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
     </header>
 
     <main class="main-scroller" id="content-engine"></main>
 
     <script>
-        const cloudID = "dssk5tabb";
-        
-        // القائمة المدمجة (الأسماء القديمة + الجديدة التي أرسلتها)
-        const videoArchive = [
+        const cloudName = "dssk5tabb";
+        const collectionID = "E327fbf8798492ab3ea7fe3f7f22eb7c";
+        const manualArchive = [
             "20_xfje8w", "21_w4wece", "23_a80hnj", "24_biyybp", "25_hijmjm", 
             "26_vdqhwz", "28_yra4wi", "29_ypq1wb", 
             "Homework3_e2fj", "homework4_zito", "homework5_eyb", "homework6_gst", 
@@ -60,32 +49,35 @@
             "homework13_ox", "homework14_nl", "homework15_k2", "homework1_pqiu", "homework2_ye4"
         ];
 
-        const engine = document.getElementById('content-engine');
+        async function init() {
+            const engine = document.getElementById('content-engine');
+            
+            try {
+                const response = await fetch(`https://res.cloudinary.com/${cloudName}/video/list/${collectionID}.json`);
+                const data = await response.json();
+                data.resources.forEach((video) => render(video.public_id, engine));
+            } catch (err) {
+                manualArchive.forEach((id) => render(id, engine));
+            }
 
-        videoArchive.forEach((id, index) => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+            startObserver();
+        }
+
+        function render(id, container) {
             const section = document.createElement('section');
             section.className = 'video-section';
             section.innerHTML = `
                 <div class="hud-overlay"><div class="corner t-l"></div><div class="corner b-r"></div></div>
-                <div class="video-bg">
-                    <video loop playsinline muted src="https://res.cloudinary.com/${cloudID}/video/upload/q_auto:best,f_auto/${id}.mp4"></video>
-                </div>
+                <video loop playsinline muted src="https://res.cloudinary.com/${cloudName}/video/upload/q_auto,f_auto/${id}.mp4"></video>
                 <div class="info-panel">
-                    <div class="node-tag">DATABASE_ENTRY_${(index + 1).toString().padStart(2, '0')}</div>
-                    <h2 class="main-title">HOMEWORK<br>STUDIO</h2>
-                    <p class="text-white/20 text-[9px] mt-8 tracking-[8px] uppercase font-bold italic">Reference_ID: ${id}</p>
+                    <div class="node-tag">ID: ${id}</div>
+                    <h2 class="text-6xl font-black uppercase tracking-tighter" style="font-family: 'Orbitron';">HOMEWORK<br>STUDIO</h2>
                 </div>
             `;
-            engine.appendChild(section);
-        });
-
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
-            }, 2000);
-            startObserver();
-        });
+            container.appendChild(section);
+        }
 
         function startObserver() {
             const obs = new IntersectionObserver((entries) => {
@@ -98,15 +90,8 @@
             document.querySelectorAll('.video-section').forEach(s => obs.observe(s));
         }
 
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('live-clock').innerText = 
-                now.getHours().toString().padStart(2, '0') + ":" + 
-                now.getMinutes().toString().padStart(2, '0') + ":" + 
-                now.getSeconds().toString().padStart(2, '0') + " // SYSTEM_ACTIVE";
-        }, 1000);
-
         window.onclick = () => { document.querySelectorAll('video').forEach(v => v.muted = false); };
+        init();
     </script>
 </body>
 </html>
