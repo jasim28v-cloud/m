@@ -1,141 +1,80 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إمبراطورية الظل | SHΔDØW EMPIRE</title>
-    
+    <title>SHADOW EMPIRE</title>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
     <style>
-        :root { --p: #ff0050; --s: #00f2ea; --bg: #000; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; }
-
-        /* واجهة التمرير العمودي (TikTok Style) */
-        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        #feed::-webkit-scrollbar { display: none; }
-        
-        .v-card { position: relative; height: 100vh; width: 100%; scroll-snap-align: start; display: flex; justify-content: center; background: #000; }
-        video { width: 100%; height: 100%; object-fit: cover; max-width: 500px; cursor: pointer; }
-
-        /* الهوية البصرية */
-        .logo { position: fixed; top: 20px; right: 20px; z-index: 1000; font-weight: bold; font-size: 22px; cursor: pointer; background: linear-gradient(45deg, var(--p), var(--s)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(255,0,80,0.6)); font-family: sans-serif; }
-        .info { position: absolute; bottom: 40px; left: 20px; text-shadow: 2px 2px 10px #000; z-index: 10; pointer-events: none; }
-        .side-icons { position: absolute; right: 20px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
-        .icon { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); font-size: 20px; }
-
-        /* لوحة التحكم السرية */
-        #admin-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
-        .admin-box { background: #111; border: 2px solid var(--p); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px var(--p); }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--s); color: #fff; border-radius: 8px; text-align: center; }
-        .btn { width: 100%; padding: 12px; background: var(--p); border: none; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        :root { --p: #ff0050; --s: #00f2ea; }
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        .v-card { height: 100vh; width: 100%; scroll-snap-align: start; display: flex; justify-content: center; position: relative; background: #000; }
+        video { height: 100%; width: 100%; object-fit: cover; max-width: 500px; }
+        .logo { position: fixed; top: 20px; right: 20px; z-index: 1000; font-weight: bold; font-size: 24px; cursor: pointer; color: var(--p); text-shadow: 0 0 10px var(--p); }
+        #admin { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .box { background: #111; padding: 30px; border-radius: 15px; border: 1px solid var(--s); text-align: center; width: 80%; }
+        button { width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; font-weight: bold; border-radius: 5px; border: none; }
     </style>
 </head>
 <body>
 
-    <div class="logo" id="adminTrigger">SHΔDØW.EXE</div>
+    <div class="logo" id="gate">SHΔDØW.EXE</div>
+    <div id="feed"></div>
 
-    <div id="feed">
-        </div>
-
-    <div id="admin-gate">
-        <div class="admin-box">
-            <h2 style="color: var(--s); margin-bottom: 10px;">نظام التحكم المركزي</h2>
-            <p style="font-size: 12px; color: #888; margin-bottom: 20px;">ادخل الرمز السري للوصول للسحابة</p>
-            <input type="password" id="adminPass" placeholder="كلمة المرور">
-            <button class="btn" onclick="verifyAdmin()">دخول النظام</button>
-            <div id="uploadSection" style="display:none; margin-top: 20px;">
-                <button id="upload_widget" class="btn" style="background:var(--s); color:#000">رفع فيديو جديد للعامة 🔥</button>
+    <div id="admin">
+        <div class="box">
+            <h2 style="color:var(--s)">Admin Panel</h2>
+            <input type="password" id="pass" placeholder="Password" style="width:90%; padding:10px; margin-bottom:10px;">
+            <button onclick="login()" style="background:var(--p); color:#fff;">Login</button>
+            <div id="tools" style="display:none; margin-top:20px;">
+                <button id="up" style="background:var(--s); color:#000;">Upload Video 🔥</button>
             </div>
-            <button onclick="document.getElementById('admin-gate').style.display='none'" style="background:none; border:none; color:#555; margin-top:15px; cursor:pointer">إغلاق</button>
+            <p onclick="document.getElementById('admin').style.display='none'" style="color:#555; cursor:pointer; margin-top:10px;">Close</p>
         </div>
     </div>
 
     <script>
-        // 1. إعدادات قاعدة البيانات (تم الحقن بنجاح)
-        const firebaseConfig = {
-            databaseURL: "https://porn-dc411-default-rtdb.firebaseio.com/" 
-        };
-        firebase.initializeApp(firebaseConfig);
+        // --- IMPORTANT: Paste your Firebase Link below ---
+        const conf = { databaseURL: "https://porn-dc411-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(conf);
         const db = firebase.database();
 
-        // 2. جلب وعرض الفيديوهات للجمهور
-        db.ref('videos').on('value', (snapshot) => {
-            const feed = document.getElementById('feed');
-            feed.innerHTML = ''; 
-            const data = snapshot.val();
-            if (data) {
-                Object.keys(data).reverse().forEach(id => {
-                    const v = data[id];
-                    const card = document.createElement('div');
-                    card.className = 'v-card';
-                    card.innerHTML = `
-                        <video loop playsinline onclick="this.paused?this.play():this.pause()">
-                            <source src="${v.url}" type="video/mp4">
-                        </video>
-                        <div class="side-icons">
-                            <div class="icon">❤️</div>
-                            <div class="icon">💬</div>
-                        </div>
-                        <div class="overlay info">
-                            <h3 style="color:var(--s)">@Master_Shadow</h3>
-                            <p>بث مباشر من السحابة العامة</p>
-                        </div>
-                    `;
-                    feed.appendChild(card);
-                });
-                initObserver();
+        // Load Videos
+        db.ref('videos').on('value', (s) => {
+            const f = document.getElementById('feed'); f.innerHTML = '';
+            const data = s.val();
+            for(let id in data) {
+                const v = data[id];
+                const card = document.createElement('div'); card.className = 'v-card';
+                card.innerHTML = `<video loop playsinline onclick="this.paused?this.play():this.pause()"><source src="${v.url}" type="video/mp4"></video>`;
+                f.prepend(card);
             }
+            obs();
         });
 
-        // 3. محرك الرفع (Cloudinary)
-        var myWidget = cloudinary.createUploadWidget({
-            cloudName: "dssk5tabb", 
-            uploadPreset: "ml_default" 
-        }, (error, result) => {
-            if (!error && result && result.event === "success") {
-                db.ref('videos').push({
-                    url: result.info.secure_url,
-                    timestamp: Date.now()
-                });
-                alert("تم الاختراق.. أقصد تم الرفع بنجاح! الفيدو الآن عام للناس.");
+        // Upload Logic
+        var w = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "ml_default" }, (err, res) => {
+            if (!err && res && res.event === "success") {
+                db.ref('videos').push({ url: res.info.secure_url });
+                alert("Success!");
             }
         });
+        document.getElementById("up").onclick = () => w.open();
 
-        document.getElementById("upload_widget").onclick = () => myWidget.open();
+        // Secret Access (Long Press 3s)
+        let t;
+        const btn = document.getElementById("gate");
+        btn.onmousedown = btn.ontouchstart = () => t = setTimeout(() => document.getElementById('admin').style.display='flex', 3000);
+        btn.onmouseup = btn.ontouchend = () => clearTimeout(t);
 
-        // 4. نظام الدخول السري (اضغط مطولاً 2 ثانية على اللوجو)
-        let timer;
-        const trigger = document.getElementById("adminTrigger");
-        
-        trigger.addEventListener('mousedown', startTimer);
-        trigger.addEventListener('touchstart', startTimer);
-        trigger.addEventListener('mouseup', endTimer);
-        trigger.addEventListener('touchend', endTimer);
+        function login() { if(document.getElementById('pass').value === "1234") document.getElementById('tools').style.display='block'; }
 
-        function startTimer() { timer = setTimeout(() => document.getElementById('admin-gate').style.display='flex', 2000); }
-        function endTimer() { clearTimeout(timer); }
-
-        function verifyAdmin() {
-            if(document.getElementById('adminPass').value === "1234") {
-                document.getElementById('uploadSection').style.display = 'block';
-                document.getElementById('adminPass').style.display = 'none';
-                document.querySelector('.btn').style.display = 'none';
-            } else { alert("رمز خاطئ!"); }
-        }
-
-        // 5. محرك التشغيل التلقائي عند التمرير
-        function initObserver() {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if(v) { e.isIntersecting ? v.play() : v.pause(); }
-                });
-            }, { threshold: 0.7 });
-            document.querySelectorAll('.v-card').forEach(c => observer.observe(c));
+        function obs() {
+            const o = new IntersectionObserver(es => { es.forEach(e => { const v = e.target.querySelector('video'); if(v) e.isIntersecting ? v.play() : v.pause(); }); }, { threshold: 0.6 });
+            document.querySelectorAll('.v-card').forEach(c => o.observe(c));
         }
     </script>
 </body>
