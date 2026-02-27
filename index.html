@@ -1,36 +1,48 @@
-<div style="font-family: Arial, sans-serif; text-align: center; background: #1a1a1a; color: white; padding: 20px; border-radius: 10px;">
-    <h2>🎥 مكتبة الأفلام (31 فيديو)</h2>
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+
+# إعداد المتصفح ليعمل في الخلفية
+chrome_options = Options()
+chrome_options.add_argument("--headless") # اجعله يفتح بدون واجهة رسومية ليكون أسرع
+
+# تشغيل المتصفح
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+url = "https://collection.cloudinary.com/dssk5tabb/9684298eb3619a60cd7abc8b1dbbcbfe"
+
+try:
+    print("--- جاري فتح الرابط وتحليل البيانات... ---")
+    driver.get(url)
     
-    <video id="mainPlayer" width="100%" controls style="max-width: 800px; border: 3px solid #ff4500; border-radius: 10px; box-shadow: 0 0 15px rgba(255, 69, 0, 0.5);">
-        <source src="https://res.cloudinary.com/dssk5tabb/video/upload/01_Itzbic.mp4" type="video/mp4">
-    </video>
+    # الانتظار قليلاً لتحميل الصفحة
+    time.sleep(5)
     
-    <h3 id="currentTitle" style="margin-top: 15px; color: #ff4500;">أنت تشاهد الآن: فيديو 01</h3>
+    # التمرير لأسفل عدة مرات للتأكد من تحميل الـ 31 فيديو بالكامل
+    for _ in range(5):
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
 
-    <div id="playlist" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; max-width: 800px; margin-left: auto; margin-right: auto; max-height: 200px; overflow-y: auto; padding: 10px; background: #333; border-radius: 5px;">
-        </div>
-</div>
+    # استخراج كل الوسوم التي تحتوي على فيديو
+    video_elements = driver.find_elements("tag name", "video")
+    source_elements = driver.find_elements("tag name", "source")
+    
+    video_links = set() # استخدام set لمنع التكرار
 
-<script>
-    const playlistDiv = document.getElementById('playlist');
-    const player = document.getElementById('mainPlayer');
-    const titleText = document.getElementById('currentTitle');
+    # البحث عن الروابط المباشرة
+    for el in video_elements + source_elements:
+        src = el.get_attribute("src")
+        if src and "cloudinary.com" in src:
+            video_links.add(src)
 
-    // إنشاء 31 زر تلقائياً
-    for (let i = 1; i <= 31; i++) {
-        let num = i < 10 ? '0' + i : i; // إضافة صفر للأرقام أقل من 10
-        let btn = document.createElement('button');
-        btn.innerText = num;
-        btn.style = "padding: 10px; cursor: pointer; background: #444; color: white; border: none; border-radius: 3px; font-weight: bold;";
-        btn.onclick = function() {
-            let videoUrl = `https://res.cloudinary.com/dssk5tabb/video/upload/${num}_Itzbic.mp4`;
-            player.src = videoUrl;
-            titleText.innerText = "أنت تشاهد الآن: فيديو " + num;
-            player.play();
-            // تمييز الزر النشط
-            document.querySelectorAll('#playlist button').forEach(b => b.style.background = '#444');
-            btn.style.background = '#ff4500';
-        };
-        playlistDiv.appendChild(btn);
-    }
-</script>
+    # طباعة النتائج
+    print(f"\n✅ تم العثور على {len(video_links)} فيديو:")
+    print("-" * 50)
+    for i, link in enumerate(video_links, 1):
+        print(f"فيديو {i}: {link}")
+    print("-" * 50)
+
+finally:
+    driver.quit()
