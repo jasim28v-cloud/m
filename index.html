@@ -1,115 +1,133 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STUDIO HOMEWORK | MODY FIX</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إمبراطورية الظل | SHΔDØW EMPIRE</title>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&family=Orbitron:wght@900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
-        :root { --neon: #00f3ff; }
-        body, html { margin: 0; padding: 0; background: #000; color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; height: 100%; width: 100%; }
-        
-        .main-scroller { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .main-scroller::-webkit-scrollbar { display: none; }
-        
-        .video-section { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #050505; }
-        .video-bg { position: absolute; inset: 0; z-index: 1; }
-        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6); }
+        :root { --p: #ff0050; --s: #00f2ea; --bg: #000; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; overflow: hidden; }
 
-        .info-panel { position: absolute; bottom: 10%; left: 5%; z-index: 100; pointer-events: none; }
-        .node-tag { background: rgba(0, 243, 255, 0.1); border-left: 3px solid var(--neon); color: var(--neon); padding: 5px 15px; font-size: 11px; font-family: 'Orbitron'; margin-bottom: 10px; display: inline-block; }
-        .main-title { font-family: 'Orbitron'; font-weight: 900; font-size: clamp(2.5rem, 10vw, 6rem); line-height: 0.9; background: linear-gradient(to bottom, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* واجهة العرض الرئيسية */
+        #main-feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        #main-feed::-webkit-scrollbar { display: none; }
+        .v-card { position: relative; height: 100vh; width: 100%; scroll-snap-align: start; display: flex; justify-content: center; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; max-width: 500px; cursor: pointer; }
 
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
-        .load-bar { width: 150px; height: 2px; background: rgba(255,255,255,0.1); margin-top: 15px; position: relative; overflow: hidden; }
-        .load-bar::after { content: ''; position: absolute; width: 40%; height: 100%; background: var(--neon); animation: load 1.2s infinite; }
-        @keyframes load { 0% { left: -40%; } 100% { left: 100%; } }
+        /* العناصر العائمة */
+        .logo { position: fixed; top: 20px; right: 20px; font-family: 'Orbitron'; font-size: 22px; z-index: 1000; cursor: pointer; background: linear-gradient(45deg, var(--p), var(--s)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(255,0,80,0.5)); }
+        .overlay { position: absolute; bottom: 40px; left: 20px; text-shadow: 2px 2px 10px #000; z-index: 10; pointer-events: none; }
+        .side-icons { position: absolute; right: 20px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
+        .icon-btn { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
 
-        .side-nav { position: fixed; right: 25px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
-        .nav-btn { width: 45px; height: 45px; border: 1px solid var(--neon); background: rgba(0,0,0,0.6); color: var(--neon); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        /* لوحة التحكم الإدارية */
+        #admin-gate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .admin-box { background: #111; border: 2px solid var(--p); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--s); color: #fff; border-radius: 8px; }
+        .btn-action { width: 100%; padding: 12px; background: var(--p); border: none; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="text-cyan-400 font-black tracking-[8px] text-[10px]" style="font-family: 'Orbitron';">CONNECTING_TO_CLOUD</div>
-        <div class="load-bar"></div>
-    </div>
+    <div class="logo" id="adminTrigger">SHΔDØW.EXE</div>
 
-    <div class="side-nav">
-        <button class="nav-btn" onclick="toggleMute()"><i class="fas fa-volume-mute" id="m-icon"></i></button>
-        <button class="nav-btn" onclick="document.querySelector('.main-scroller').scrollBy({top: window.innerHeight, behavior:'smooth'})"><i class="fas fa-arrow-down"></i></button>
-    </div>
-
-    <header class="fixed top-0 w-full z-[1000] p-8 flex justify-between items-start pointer-events-none">
-        <div class="flex items-center gap-4">
-            <div class="w-1 h-12 bg-cyan-400 shadow-[0_0_15px_#00f3ff]"></div>
-            <div>
-                <h1 class="text-2xl font-black tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
-                <div class="text-[8px] text-white/30 tracking-[4px]">ASSET_STREAMING_ACTIVE</div>
-            </div>
+    <div id="main-feed">
         </div>
-        <div class="text-cyan-400 text-[10px] font-bold">NODE: <span id="idx">01</span> / 31</div>
-    </header>
 
-    <main class="main-scroller" id="content-engine"></main>
+    <div id="admin-gate">
+        <div class="admin-box">
+            <h2 style="color: var(--s)">غرفة التحكم السرية</h2>
+            <input type="password" id="adminPass" placeholder="كلمة المرور">
+            <button class="btn-action" onclick="verifyAdmin()">دخول النظام</button>
+            <div id="uploadSection" style="display:none">
+                <input type="text" id="vidDesc" placeholder="وصف الفيديو...">
+                <button id="upload_widget" class="btn-action" style="background:var(--s); color:#000">رفع فيديو للسحابة 🔥</button>
+            </div>
+            <button onclick="closeAdmin()" style="background:none; border:none; color:#555; margin-top:15px; cursor:pointer">إغلاق</button>
+        </div>
+    </div>
 
     <script>
-        const cloudID = "dssk5tabb";
-        const folder = "mody";
-        const engine = document.getElementById('content-engine');
-        const count = 31;
-
-        for (let i = 1; i <= count; i++) {
-            const num = i.toString().padStart(2, '0');
-            const videoName = `${num}_Itzbic`;
-            
-            // جربت هنا الرابط بأبسط صورة ممكنة وبدون ضغط معقد للتأكد من الظهور
-            const videoURL = `https://res.cloudinary.com/${cloudID}/video/upload/${folder}/${videoName}.mp4`;
-
-            const section = document.createElement('section');
-            section.className = 'video-section';
-            section.dataset.n = num;
-            section.innerHTML = `
-                <div class="video-bg">
-                    <video loop playsinline muted preload="auto" src="${videoURL}"></video>
-                </div>
-                <div class="info-panel">
-                    <div class="node-tag">VISION NODE ${num}</div>
-                    <h2 class="main-title">CINEMATIC<br>STUDIO</h2>
-                </div>
-            `;
-            engine.appendChild(section);
-        }
-
-        const obs = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                const v = e.target.querySelector('video');
-                if (e.isIntersecting) {
-                    v.play().catch(err => console.log("Error playing video"));
-                    document.getElementById('idx').innerText = e.target.dataset.n;
-                } else {
-                    v.pause();
-                }
-            });
-        }, { threshold: 0.5 });
-
-        document.querySelectorAll('.video-section').forEach(s => obs.observe(s));
-
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
-            }, 1000);
+        // 1. إعدادات Firebase (يجب أن تضع بياناتك هنا ليعمل الموقع للعامة)
+        const firebaseConfig = {
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com" 
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        let isMute = true;
-        function toggleMute() {
-            isMute = !isMute;
-            document.querySelectorAll('video').forEach(v => v.muted = isMute);
-            document.getElementById('m-icon').className = isMute ? "fas fa-volume-mute" : "fas fa-volume-up";
+        // 2. إعدادات Cloudinary
+        const CLOUD_NAME = "dssk5tabb";
+        const UPLOAD_PRESET = "ml_default"; // تأكد أنه Unsigned
+
+        // 3. جلب الفيديوهات وعرضها للعامة (تلقائي)
+        db.ref('videos').on('value', (snapshot) => {
+            const feed = document.getElementById('main-feed');
+            feed.innerHTML = ''; // مسح القديم
+            const data = snapshot.val();
+            for (let id in data) {
+                const v = data[id];
+                const card = document.createElement('div');
+                card.className = 'v-card';
+                card.innerHTML = `
+                    <video loop playsinline onclick="this.paused?this.play():this.pause()">
+                        <source src="${v.url}" type="video/mp4">
+                    </video>
+                    <div class="side-icons">
+                        <div class="icon-btn">❤️</div>
+                        <div class="icon-btn">💬</div>
+                    </div>
+                    <div class="overlay">
+                        <h3>@${v.user}</h3>
+                        <p>${v.desc}</p>
+                    </div>
+                `;
+                feed.prepend(card); // الجديد يظهر في الأعلى
+            }
+            refreshObserver();
+        });
+
+        // 4. نظام الرفع (لصاحب الموقع فقط)
+        var myWidget = cloudinary.createUploadWidget({
+            cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET,
+            sources: ['local', 'camera']
+        }, (error, result) => {
+            if (!error && result && result.event === "success") {
+                const desc = document.getElementById('vidDesc').value || "بدون وصف";
+                db.ref('videos').push({
+                    url: result.info.secure_url,
+                    user: "Master",
+                    desc: desc
+                });
+                alert("تم النشر للعامة بنجاح!");
+            }
+        });
+
+        document.getElementById("upload_widget").onclick = () => myWidget.open();
+
+        // 5. وظائف الإدارة
+        let timer;
+        document.getElementById("adminTrigger").onmousedown = () => timer = setTimeout(() => document.getElementById('admin-gate').style.display='flex', 2000);
+        document.getElementById("adminTrigger").onmouseup = () => clearTimeout(timer);
+        
+        function verifyAdmin() {
+            if(document.getElementById('adminPass').value === "1234") {
+                document.getElementById('uploadSection').style.display = 'block';
+                document.getElementById('adminPass').style.display = 'none';
+            }
+        }
+        function closeAdmin() { document.getElementById('admin-gate').style.display='none'; }
+
+        // 6. محرك التشغيل التلقائي عند التمرير
+        function refreshObserver() {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(e => { const v = e.target.querySelector('video'); if(v) e.isIntersecting ? v.play() : v.pause(); });
+            }, { threshold: 0.6 });
+            document.querySelectorAll('.v-card').forEach(s => observer.observe(s));
         }
     </script>
 </body>
