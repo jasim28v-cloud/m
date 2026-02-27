@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STUDIO HOMEWORK | MODY 2027</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+        :root { --neon: #00f3ff; --glass: rgba(0, 0, 0, 0.8); }
+
+        body, html { 
+            margin: 0; padding: 0; background: #000; color: #fff; 
+            overflow: hidden; font-family: 'Rajdhani', sans-serif;
+            height: 100%; width: 100%;
+        }
+
+        /* حاوية التمرير */
+        .main-scroller { 
+            height: 100vh; width: 100vw;
+            overflow-y: scroll; scroll-snap-type: y mandatory; 
+            scrollbar-width: none; scroll-behavior: smooth;
+        }
+        .main-scroller::-webkit-scrollbar { display: none; }
+
+        .video-section { 
+            height: 100vh; width: 100vw; scroll-snap-align: start; 
+            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* محرك الفيديو */
+        .video-bg { position: absolute; inset: 0; z-index: 1; }
+        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); transition: 1s; }
+        
+        /* واجهة HUD */
+        .hud-overlay {
+            position: absolute; inset: 25px; border: 1px solid rgba(0, 243, 255, 0.1);
+            pointer-events: none; z-index: 10; border-radius: 20px;
+        }
+        .corner { position: absolute; width: 30px; height: 30px; border: 2px solid var(--neon); filter: drop-shadow(0 0 10px var(--neon)); }
+        .t-l { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+        .b-r { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+        .info-panel {
+            position: absolute; bottom: 8%; right: 5%; z-index: 100;
+            text-align: left; pointer-events: none;
+        }
+        .node-tag {
+            background: rgba(0, 243, 255, 0.1); border-left: 3px solid var(--neon);
+            color: var(--neon); padding: 5px 15px; font-size: 12px;
+            font-family: 'Orbitron'; margin-bottom: 10px; display: inline-block;
+        }
+        .main-title {
+            font-family: 'Orbitron'; font-weight: 900; font-size: clamp(2rem, 10vw, 5rem);
+            line-height: 1; text-transform: uppercase;
+            background: linear-gradient(to bottom, #fff, var(--neon));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* أزرار التحكم */
+        .controls {
+            position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 20px; z-index: 1000;
+        }
+        .btn-action {
+            width: 50px; height: 50px; border: 1px solid var(--neon);
+            background: rgba(0,0,0,0.6); color: var(--neon);
+            border-radius: 50%; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; transition: 0.3s;
+            backdrop-filter: blur(5px); pointer-events: all;
+        }
+        .btn-action:hover { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); }
+
+        /* شاشة التحميل */
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .scanline { width: 200px; height: 1px; background: var(--neon); position: relative; margin-top: 20px; overflow: hidden; }
+        .scanline::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; animation: move 2s infinite; }
+        @keyframes move { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="text-cyan-400 font-black tracking-[12px] text-[10px]" style="font-family: 'Orbitron';">ACCESSING_MODY_ARCHIVE</div>
+        <div class="scanline"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-action" onclick="toggleMute()"><i class="fas fa-volume-mute" id="mute-icon"></i></button>
+        <button class="btn-action" onclick="goNext()"><i class="fas fa-chevron-down"></i></button>
+    </div>
+
+    <header class="fixed top-0 w-full z-[1000] p-8 flex justify-between items-start pointer-events-none">
+        <div class="flex items-center gap-4">
+            <div class="w-1 h-12 bg-cyan-400"></div>
+            <div>
+                <h1 class="font-black text-2xl tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
+                <div id="clock" class="text-[9px] text-white/40 tracking-[5px] mt-1">00:00:00 // SECURE</div>
+            </div>
+        </div>
+        <div class="bg-black/50 border border-cyan-500/30 px-4 py-1 rounded text-[10px] text-cyan-400 tracking-[3px]">
+            ARCHIVE: <span id="current-node">01</span> / 99
+        </div>
+    </header>
+
+    <main class="main-scroller" id="content-engine"></main>
+
+    <script>
+        const cloudID = "dssk5tabb";
+        const folder = "mody";
+        const engine = document.getElementById('content-engine');
+
+        // إنشاء الـ 99 فيديو تلقائياً بناءً على تفكيك الرابط
+        for (let i = 1; i <= 99; i++) {
+            const num = i.toString().padStart(2, '0');
+            const videoID = `${num}_Itzbic`;
+            const videoURL = `https://res.cloudinary.com/${cloudID}/video/upload/q_auto:eco,f_auto/${folder}/${videoID}.mp4`;
+
+            const section = document.createElement('section');
+            section.className = 'video-section';
+            section.dataset.index = num;
+            section.innerHTML = `
+                <div class="hud-overlay"><div class="corner t-l"></div><div class="corner b-r"></div></div>
+                <div class="video-bg">
+                    <video loop playsinline muted src="${videoURL}"></video>
+                </div>
+                <div class="info-panel">
+                    <div class="node-tag">DATA_NODE_${num}</div>
+                    <h2 class="main-title">STUDIO<br>HOMEWORK</h2>
+                    <p class="text-white/20 text-[10px] mt-4 tracking-[4px]">REF_ID: ${videoID} // 2027</p>
+                </div>
+            `;
+            engine.appendChild(section);
+        }
+
+        // تشغيل الفيديو عند الظهور
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const vid = entry.target.querySelector('video');
+                if (entry.isIntersecting) {
+                    vid.play();
+                    document.getElementById('current-node').innerText = entry.target.dataset.index;
+                } else {
+                    vid.pause();
+                }
+            });
+        }, { threshold: 0.6 });
+
+        document.querySelectorAll('.video-section').forEach(s => observer.observe(s));
+
+        // التحكم بالصوت
+        let isMuted = true;
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.querySelectorAll('video').forEach(v => v.muted = isMuted);
+            document.getElementById('mute-icon').className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
+        }
+
+        function goNext() {
+            engine.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+        }
+
+        // إخفاء التحميل
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
+            }, 1500);
+        };
+
+        // الساعة
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('clock').innerText = d.toLocaleTimeString() + " // SYSTEM_ACTIVE";
+        }, 1000);
+    </script>
+</body>
+</html>
