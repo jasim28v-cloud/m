@@ -1,48 +1,165 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-import time
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STUDIO HOMEWORK | AUTOMATED SYSTEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
-# إعداد المتصفح ليعمل في الخلفية
-chrome_options = Options()
-chrome_options.add_argument("--headless") # اجعله يفتح بدون واجهة رسومية ليكون أسرع
+        :root { --neon: #00f3ff; --glass: rgba(0, 0, 0, 0.85); }
 
-# تشغيل المتصفح
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        body, html { 
+            margin: 0; padding: 0; background: #000; color: #fff; 
+            overflow: hidden; font-family: 'Rajdhani', sans-serif;
+            height: 100%; width: 100%;
+        }
 
-url = "https://collection.cloudinary.com/dssk5tabb/9684298eb3619a60cd7abc8b1dbbcbfe"
+        /* حاوية التمرير */
+        .main-scroller { 
+            height: 100vh; width: 100vw;
+            overflow-y: scroll; scroll-snap-type: y mandatory; 
+            scrollbar-width: none; scroll-behavior: smooth;
+        }
+        .main-scroller::-webkit-scrollbar { display: none; }
 
-try:
-    print("--- جاري فتح الرابط وتحليل البيانات... ---")
-    driver.get(url)
-    
-    # الانتظار قليلاً لتحميل الصفحة
-    time.sleep(5)
-    
-    # التمرير لأسفل عدة مرات للتأكد من تحميل الـ 31 فيديو بالكامل
-    for _ in range(5):
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(2)
+        .video-section { 
+            height: 100vh; width: 100vw; scroll-snap-align: start; 
+            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
 
-    # استخراج كل الوسوم التي تحتوي على فيديو
-    video_elements = driver.find_elements("tag name", "video")
-    source_elements = driver.find_elements("tag name", "source")
-    
-    video_links = set() # استخدام set لمنع التكرار
+        .video-bg { position: absolute; inset: 0; z-index: 1; }
+        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5) contrast(1.2); transition: 1.5s ease; }
 
-    # البحث عن الروابط المباشرة
-    for el in video_elements + source_elements:
-        src = el.get_attribute("src")
-        if src and "cloudinary.com" in src:
-            video_links.add(src)
+        /* تصميم HUD */
+        .hud-overlay {
+            position: absolute; inset: 30px; border: 1px solid rgba(0, 243, 255, 0.1);
+            pointer-events: none; z-index: 10; border-radius: 25px;
+        }
+        .corner { position: absolute; width: 40px; height: 40px; border: 3px solid var(--neon); filter: drop-shadow(0 0 15px var(--neon)); }
+        .t-l { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-radius: 20px 0 0 0; }
+        .b-r { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-radius: 0 0 20px 0; }
 
-    # طباعة النتائج
-    print(f"\n✅ تم العثور على {len(video_links)} فيديو:")
-    print("-" * 50)
-    for i, link in enumerate(video_links, 1):
-        print(f"فيديو {i}: {link}")
-    print("-" * 50)
+        .info-panel {
+            position: absolute; bottom: 80px; left: 50px; z-index: 100;
+            max-width: 85%; pointer-events: none;
+        }
+        .node-tag {
+            background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon);
+            color: var(--neon); padding: 5px 15px; font-size: 10px;
+            letter-spacing: 5px; font-family: 'Orbitron'; margin-bottom: 25px; display: inline-block;
+        }
+        .main-title {
+            font-family: 'Orbitron'; font-weight: 900; font-size: clamp(3rem, 12vw, 6.5rem);
+            line-height: 0.8; text-transform: uppercase; letter-spacing: -4px;
+            background: linear-gradient(to right, #fff, var(--neon));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
 
-finally:
-    driver.quit()
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease;
+        }
+        .progress-bar { width: 200px; height: 2px; background: rgba(255,255,255,0.1); position: relative; margin-top: 20px; }
+        .progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--neon); animation: sync 2.5s infinite; }
+        @keyframes sync { 0% { width: 0%; left: 0; } 50% { width: 100%; left: 0; } 100% { width: 0%; left: 100%; } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="text-cyan-400 font-black tracking-[12px] animate-pulse text-[10px]" style="font-family: 'Orbitron';">FETCHING_COLLECTION_DATA</div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+
+    <header class="fixed top-0 w-full z-[1000] p-10 flex justify-between items-start pointer-events-none">
+        <div class="flex items-center gap-6">
+            <div class="w-1 h-16 bg-cyan-400 shadow-[0_0_20px_#00f3ff]"></div>
+            <div>
+                <h1 class="font-black text-3xl tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
+                <div id="live-clock" class="text-[9px] text-white/40 tracking-[6px] mt-1">00:00:00 // SYSTEM_ACTIVE</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-scroller" id="content-engine"></main>
+
+    <script>
+        // --- الإعدادات المستخرجة من الرابط الخاص بك ---
+        const cloudName = "dssk5tabb";
+        const collectionID = "6a8d127a321bad76ddd52dcaf9f5e57d";
+
+        // رابط استخراج القائمة برمجياً
+        const jsonUrl = `https://res.cloudinary.com/${cloudName}/video/list/${collectionID}.json`;
+
+        async function initEngine() {
+            try {
+                const response = await fetch(jsonUrl);
+                const data = await response.json();
+                const engine = document.getElementById('content-engine');
+
+                data.resources.forEach((video, index) => {
+                    const id = video.public_id;
+                    const section = document.createElement('section');
+                    section.className = 'video-section';
+                    section.innerHTML = `
+                        <div class="hud-overlay"><div class="corner t-l"></div><div class="corner b-r"></div></div>
+                        <div class="video-bg">
+                            <video loop playsinline muted src="https://res.cloudinary.com/${cloudName}/video/upload/q_auto:best,f_auto/${id}.mp4"></video>
+                        </div>
+                        <div class="info-panel">
+                            <div class="node-tag">COLLECTION_NODE_${(index + 1).toString().padStart(2, '0')}</div>
+                            <h2 class="main-title">HOMEWORK<br>STUDIO</h2>
+                            <p class="text-white/20 text-[9px] mt-8 tracking-[8px] uppercase font-bold italic">ID: ${id}</p>
+                        </div>
+                    `;
+                    engine.appendChild(section);
+                });
+
+                hideLoader();
+                startObserver();
+
+            } catch (err) {
+                console.error("فشل في تحميل المجموعة، تأكد أن خاصية Resource Listing مفعلة في Cloudinary.");
+                // عرض رسالة خطأ بسيطة في حال فشل التحميل التلقائي
+                document.getElementById('loader').innerText = "ERROR: COLLECTION_NOT_ACCESSIBLE";
+            }
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 1000);
+        }
+
+        function startObserver() {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    const vid = e.target.querySelector('video');
+                    if (e.isIntersecting) vid.play().catch(() => {});
+                    else { vid.pause(); vid.currentTime = 0; }
+                });
+            }, { threshold: 0.6 });
+            document.querySelectorAll('.video-section').forEach(s => obs.observe(s));
+        }
+
+        // الساعة
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = 
+                now.getHours().toString().padStart(2, '0') + ":" + 
+                now.getMinutes().toString().padStart(2, '0') + ":" + 
+                now.getSeconds().toString().padStart(2, '0') + " // SYSTEM_ACTIVE";
+        }, 1000);
+
+        // تفعيل الصوت
+        window.onclick = () => { document.querySelectorAll('video').forEach(v => v.muted = false); };
+
+        // تشغيل المحرك
+        initEngine();
+    </script>
+</body>
+</html>
