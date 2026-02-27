@@ -1,237 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHΔDØW | Glass Edition</title>
+<div style="font-family: Arial, sans-serif; text-align: center; background: #1a1a1a; color: white; padding: 20px; border-radius: 10px;">
+    <h2>🎥 مكتبة الأفلام (31 فيديو)</h2>
     
-    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <video id="mainPlayer" width="100%" controls style="max-width: 800px; border: 3px solid #ff4500; border-radius: 10px; box-shadow: 0 0 15px rgba(255, 69, 0, 0.5);">
+        <source src="https://res.cloudinary.com/dssk5tabb/video/upload/01_Itzbic.mp4" type="video/mp4">
+    </video>
+    
+    <h3 id="currentTitle" style="margin-top: 15px; color: #ff4500;">أنت تشاهد الآن: فيديو 01</h3>
 
-    <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.2);
-            --neon-p: #ff0050;
-            --neon-s: #00f2ea;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            background: #050505;
-            color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
-        }
-
-        /* Animated Background */
-        .bg-glow {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
-            z-index: -1;
-        }
-
-        /* Feed Container */
-        #feed {
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scrollbar-width: none;
-        }
-        #feed::-webkit-scrollbar { display: none; }
-
-        .v-card {
-            height: 100vh;
-            width: 100%;
-            scroll-snap-align: start;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        video {
-            height: 92vh;
-            width: 95%;
-            max-width: 450px;
-            object-fit: cover;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        /* Glass Header */
-        .header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            font-weight: 900;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, var(--neon-p), var(--neon-s));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
-
-        /* Glass Overlay */
-        .info-glass {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 350px;
-            padding: 15px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            text-align: center;
-        }
-
-        /* Admin Panel */
-        #admin {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(20px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .glass-box {
-            background: var(--glass);
-            padding: 40px;
-            border-radius: 30px;
-            border: 1px solid var(--border);
-            width: 85%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(0,242,234,0.1);
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            margin: 20px 0;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid var(--neon-s);
-            border-radius: 10px;
-            color: white;
-            outline: none;
-        }
-
-        .btn-glass {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, var(--neon-p), var(--neon-s));
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-glass:hover { opacity: 0.8; transform: scale(1.02); }
-    </style>
-</head>
-<body>
-
-    <div class="bg-glow"></div>
-
-    <div class="header">
-        <div class="logo" id="sh-trigger">SHΔDØW.EXE</div>
-        <div style="font-size: 12px; opacity: 0.6;">ITZBIC SERIES</div>
-    </div>
-
-    <div id="feed"></div>
-
-    <div id="admin">
-        <div class="glass-box">
-            <h2 style="color: var(--neon-s)">CORE ACCESS</h2>
-            <input type="password" id="pass" placeholder="Enter Encryption Key">
-            <button class="btn-glass" onclick="login()">INITIALIZE</button>
-            <div id="tools" style="display:none; margin-top:30px;">
-                <button id="up" class="btn-glass" style="background: var(--neon-s); color: black;">UPLOAD NEW DATA</button>
-            </div>
-            <p onclick="document.getElementById('admin').style.display='none'" style="margin-top:20px; cursor:pointer; font-size:12px; color:#888;">TERMINATE SESSION</p>
+    <div id="playlist" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; max-width: 800px; margin-left: auto; margin-right: auto; max-height: 200px; overflow-y: auto; padding: 10px; background: #333; border-radius: 5px;">
         </div>
-    </div>
+</div>
 
-    <script>
-        const cloudName = "dssk5tabb";
-        const itzbicVideos = ["010_Itzbic", "09_Itzbic", "08_Itzbic", "07_Itzbic", "06_Itzbic", "05_Itzbic", "04_Itzbic", "03_Itzbic", "02_Itzbic", "01_Itzbic"];
-        
-        const conf = { databaseURL: "https://porn-dc411-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(conf);
-        const db = firebase.database();
+<script>
+    const playlistDiv = document.getElementById('playlist');
+    const player = document.getElementById('mainPlayer');
+    const titleText = document.getElementById('currentTitle');
 
-        function createCard(url, user) {
-            const card = document.createElement('div');
-            card.className = 'v-card';
-            card.innerHTML = `
-                <video loop playsinline onclick="this.paused?this.play():this.pause()">
-                    <source src="${url}" type="video/mp4">
-                </video>
-                <div class="info-glass">
-                    <div style="font-weight:bold; color:var(--neon-s)">@${user}</div>
-                    <div style="font-size:12px; opacity:0.7">Encrypted Stream</div>
-                </div>
-            `;
-            return card;
-        }
-
-        db.ref('videos').on('value', (s) => {
-            const f = document.getElementById('feed'); f.innerHTML = '';
-            const data = s.val();
-            if(data) Object.values(data).reverse().forEach(v => f.appendChild(createCard(v.url, "Cloud_User")));
-            itzbicVideos.forEach(name => {
-                f.appendChild(createCard(`https://res.cloudinary.com/${cloudName}/video/upload/${name}.mp4`, name));
-            });
-            obs();
-        });
-
-        var w = cloudinary.createUploadWidget({ cloudName: cloudName, uploadPreset: "ml_default" }, (err, res) => {
-            if (!err && res && res.event === "success") {
-                db.ref('videos').push({ url: res.info.secure_url });
-                alert("Data Synced!");
-            }
-        });
-        document.getElementById("up").onclick = () => w.open();
-
-        let t;
-        const gate = document.getElementById("sh-trigger");
-        gate.onmousedown = gate.ontouchstart = () => t = setTimeout(() => document.getElementById('admin').style.display='flex', 3000);
-        gate.onmouseup = gate.ontouchend = () => clearTimeout(t);
-
-        function login() { if(document.getElementById('pass').value === "1234") document.getElementById('tools').style.display='block'; }
-
-        function obs() {
-            const o = new IntersectionObserver(es => {
-                es.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if(v) e.isIntersecting ? v.play() : v.pause();
-                });
-            }, { threshold: 0.6 });
-            document.querySelectorAll('.v-card').forEach(c => o.observe(c));
-        }
-    </script>
-</body>
-</html>
+    // إنشاء 31 زر تلقائياً
+    for (let i = 1; i <= 31; i++) {
+        let num = i < 10 ? '0' + i : i; // إضافة صفر للأرقام أقل من 10
+        let btn = document.createElement('button');
+        btn.innerText = num;
+        btn.style = "padding: 10px; cursor: pointer; background: #444; color: white; border: none; border-radius: 3px; font-weight: bold;";
+        btn.onclick = function() {
+            let videoUrl = `https://res.cloudinary.com/dssk5tabb/video/upload/${num}_Itzbic.mp4`;
+            player.src = videoUrl;
+            titleText.innerText = "أنت تشاهد الآن: فيديو " + num;
+            player.play();
+            // تمييز الزر النشط
+            document.querySelectorAll('#playlist button').forEach(b => b.style.background = '#444');
+            btn.style.background = '#ff4500';
+        };
+        playlistDiv.appendChild(btn);
+    }
+</script>
