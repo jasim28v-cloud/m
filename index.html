@@ -3,206 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STUDIO HOMEWORK | MODY ARCHIVE 2027</title>
+    <title>STUDIO HOMEWORK | MODY ARCHIVE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
-
-        :root { --neon: #00f3ff; --glass: rgba(0, 0, 0, 0.8); }
-
-        body, html { 
-            margin: 0; padding: 0; background: #000; color: #fff; 
-            overflow: hidden; font-family: 'Rajdhani', sans-serif;
-            height: 100%; width: 100%;
-        }
-
-        /* Cinematic Scroller */
-        .main-scroller { 
-            height: 100vh; width: 100vw;
-            overflow-y: scroll; scroll-snap-type: y mandatory; 
-            scrollbar-width: none; scroll-behavior: smooth;
-        }
-        .main-scroller::-webkit-scrollbar { display: none; }
-
-        .video-section { 
-            height: 100vh; width: 100vw; scroll-snap-align: start; 
-            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
-        }
-
-        /* Video Background Engine */
-        .video-bg { position: absolute; inset: 0; z-index: 1; }
-        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5) contrast(1.1); transition: 1.2s ease; }
+        :root { --neon: #00f3ff; }
+        body, html { margin: 0; padding: 0; background: #000; color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; height: 100%; width: 100%; }
         
-        /* HUD Interface Elements */
-        .hud-overlay {
-            position: absolute; inset: 25px; border: 1px solid rgba(0, 243, 255, 0.1);
-            pointer-events: none; z-index: 10; border-radius: 20px;
-        }
-        .corner { position: absolute; width: 35px; height: 35px; border: 2px solid var(--neon); filter: drop-shadow(0 0 10px var(--neon)); opacity: 0.7; }
-        .t-l { top: -1px; left: -1px; border-right: 0; border-bottom: 0; border-radius: 15px 0 0 0; }
-        .b-r { bottom: -1px; right: -1px; border-left: 0; border-top: 0; border-radius: 0 0 15px 0; }
+        .main-scroller { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; scroll-behavior: smooth; }
+        .main-scroller::-webkit-scrollbar { display: none; }
+        
+        .video-section { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; }
+        .video-bg { position: absolute; inset: 0; z-index: 1; }
+        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
 
-        /* Information Panels */
-        .info-panel {
-            position: absolute; bottom: 8%; left: 50px; z-index: 100;
-            text-align: left; pointer-events: none;
-        }
-        .node-tag {
-            background: rgba(0, 243, 255, 0.15); border-left: 4px solid var(--neon);
-            color: var(--neon); padding: 6px 18px; font-size: 11px;
-            font-family: 'Orbitron'; margin-bottom: 12px; display: inline-block;
-            letter-spacing: 3px; text-transform: uppercase;
-        }
-        .main-title {
-            font-family: 'Orbitron'; font-weight: 900; font-size: clamp(2.5rem, 10vw, 6rem);
-            line-height: 0.9; text-transform: uppercase; letter-spacing: -2px;
-            background: linear-gradient(to bottom, #fff 40%, var(--neon));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-        }
+        .info-panel { position: absolute; bottom: 10%; left: 5%; z-index: 100; pointer-events: none; }
+        .node-tag { background: rgba(0, 243, 255, 0.1); border-left: 3px solid var(--neon); color: var(--neon); padding: 5px 15px; font-size: 11px; font-family: 'Orbitron'; margin-bottom: 10px; display: inline-block; letter-spacing: 2px; }
+        .main-title { font-family: 'Orbitron'; font-weight: 900; font-size: clamp(2.5rem, 10vw, 6rem); line-height: 0.9; background: linear-gradient(to bottom, #fff, var(--neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
 
-        /* Navigation Controls */
-        .side-nav {
-            position: fixed; right: 30px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 20px; z-index: 1000;
-        }
-        .nav-btn {
-            width: 50px; height: 50px; border: 1px solid rgba(0, 243, 255, 0.3);
-            background: rgba(0,0,0,0.6); color: var(--neon);
-            border-radius: 50%; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; transition: 0.4s;
-            backdrop-filter: blur(10px); pointer-events: all;
-        }
-        .nav-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 25px var(--neon); transform: scale(1.1); }
-
-        /* Smart Loader */
-        #loader {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .loading-text { font-family: 'Orbitron'; color: var(--neon); letter-spacing: 10px; font-size: 10px; margin-bottom: 20px; animation: pulse 1.5s infinite; }
-        .progress-container { width: 200px; height: 2px; background: rgba(255,255,255,0.05); position: relative; overflow: hidden; }
-        .progress-bar { position: absolute; height: 100%; background: var(--neon); width: 0%; transition: 0.5s; }
-
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
+        .load-bar { width: 150px; height: 1px; background: rgba(255,255,255,0.1); margin-top: 20px; position: relative; }
+        .load-progress { position: absolute; height: 100%; background: var(--neon); width: 0%; transition: 0.5s; }
+        
+        .side-nav { position: fixed; right: 25px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
+        .nav-btn { width: 45px; height: 45px; border: 1px solid rgba(0, 243, 255, 0.3); background: rgba(0,0,0,0.6); color: var(--neon); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="loading-text">INITIALIZING_SYSTEM_2027</div>
-        <div class="progress-container">
-            <div id="loading-fill" class="progress-bar"></div>
-        </div>
+        <div class="text-cyan-400 font-black tracking-[10px] text-[10px]" style="font-family: 'Orbitron';">LOADING_MODY_ASSETS</div>
+        <div class="load-bar"><div id="p-bar" class="load-progress"></div></div>
     </div>
 
     <div class="side-nav">
-        <button class="nav-btn" onclick="toggleAudio()" title="Toggle Sound">
-            <i class="fas fa-volume-mute" id="audio-icon"></i>
-        </button>
-        <button class="nav-btn" onclick="nextSlide()" title="Next Vision">
-            <i class="fas fa-chevron-down"></i>
-        </button>
+        <button class="nav-btn" onclick="toggleMute()"><i class="fas fa-volume-mute" id="m-icon"></i></button>
+        <button class="nav-btn" onclick="document.querySelector('.main-scroller').scrollBy({top: window.innerHeight, behavior:'smooth'})"><i class="fas fa-chevron-down"></i></button>
     </div>
 
-    <header class="fixed top-0 w-full z-[1000] p-10 flex justify-between items-start pointer-events-none">
-        <div class="flex items-center gap-6">
-            <div class="w-1 h-14 bg-cyan-400 shadow-[0_0_15px_#00f3ff]"></div>
+    <header class="fixed top-0 w-full z-[1000] p-8 flex justify-between items-start pointer-events-none">
+        <div class="flex items-center gap-4">
+            <div class="w-1 h-12 bg-cyan-400"></div>
             <div>
-                <h1 class="font-black text-3xl tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
-                <div id="digital-clock" class="text-[9px] text-white/40 tracking-[5px] mt-1 uppercase">00:00:00 // Connection: Secure</div>
+                <h1 class="text-2xl font-black tracking-tighter" style="font-family: 'Orbitron';">STUDIO<span class="text-cyan-400">.HW</span></h1>
+                <div class="text-[8px] text-white/30 tracking-[4px]">DATABASE_CONNECTED // 2027</div>
             </div>
         </div>
-        <div class="flex flex-col items-end gap-2">
-            <div class="px-4 py-1 border border-cyan-500/20 rounded bg-black/40 text-[9px] text-cyan-400 uppercase tracking-[3px] backdrop-blur-md">
-                Archive: MODY_SERIES
-            </div>
-            <div class="text-[10px] text-white/20 font-mono">
-                NODE_INDEX: <span id="node-val" class="text-cyan-400">01</span> / 99
-            </div>
+        <div class="text-right">
+            <div class="text-cyan-400 text-[10px] font-bold tracking-[2px]">ASSET: <span id="idx">01</span> / 31</div>
         </div>
     </header>
 
     <main class="main-scroller" id="content-engine"></main>
 
     <script>
-        const cloudID = "dssk5tabb";
+        const cloudName = "dssk5tabb";
         const folder = "mody";
         const engine = document.getElementById('content-engine');
+        const totalVideos = 31; // تم التعديل ليعرض 31 فيديو فقط
 
-        // Automatic Video Engine (99 Assets)
-        for (let i = 1; i <= 99; i++) {
-            const indexStr = i.toString().padStart(2, '0');
-            const videoID = `${indexStr}_Itzbic`;
-            const videoURL = `https://res.cloudinary.com/${cloudID}/video/upload/q_auto:eco,f_auto/${folder}/${videoID}.mp4`;
+        for (let i = 1; i <= totalVideos; i++) {
+            const num = i.toString().padStart(2, '0');
+            const videoID = `${num}_Itzbic`;
+            
+            // الرابط المحدث والمجرب
+            const videoURL = `https://res.cloudinary.com/${cloudName}/video/upload/q_auto,f_auto/${folder}/${videoID}.mp4`;
 
             const section = document.createElement('section');
             section.className = 'video-section';
-            section.dataset.node = indexStr;
+            section.dataset.n = num;
             section.innerHTML = `
-                <div class="hud-overlay">
-                    <div class="corner t-l"></div>
-                    <div class="corner b-r"></div>
-                </div>
                 <div class="video-bg">
-                    <video loop playsinline muted src="${videoURL}"></video>
+                    <video loop playsinline muted preload="metadata" src="${videoURL}"></video>
                 </div>
                 <div class="info-panel">
-                    <div class="node-tag">Vision Node ${indexStr}</div>
-                    <h2 class="main-title">CINEMATIC<br>HOMEWORK</h2>
-                    <p class="text-white/20 text-[10px] mt-6 tracking-[6px] uppercase font-bold">Encrypted Source // ${videoID}</p>
+                    <div class="node-tag">Vision Node ${num}</div>
+                    <h2 class="main-title">CINEMATIC<br>PROJECT</h2>
+                    <p class="text-white/20 text-[9px] mt-4 tracking-[3px]">MODY_ARCHIVE // ${videoID}</p>
                 </div>
             `;
             engine.appendChild(section);
         }
 
-        // Playback & Visibility Observer
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const video = entry.target.querySelector('video');
-                if (entry.isIntersecting) {
-                    video.play().catch(err => console.log("Autoplay blocked"));
-                    document.getElementById('node-val').innerText = entry.target.dataset.node;
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                const v = e.target.querySelector('video');
+                if (e.isIntersecting) {
+                    v.play().catch(() => {});
+                    document.getElementById('idx').innerText = e.target.dataset.n;
                 } else {
-                    video.pause();
+                    v.pause();
                 }
             });
-        }, { threshold: 0.6 });
+        }, { threshold: 0.5 });
 
-        document.querySelectorAll('.video-section').forEach(s => observer.observe(s));
+        document.querySelectorAll('.video-section').forEach(s => obs.observe(s));
 
-        // Audio Management
-        let muted = true;
-        function toggleAudio() {
-            muted = !muted;
-            const icon = document.getElementById('audio-icon');
-            document.querySelectorAll('video').forEach(v => v.muted = muted);
-            icon.className = muted ? "fas fa-volume-mute" : "fas fa-volume-up";
+        let isMute = true;
+        function toggleMute() {
+            isMute = !isMute;
+            document.querySelectorAll('video').forEach(v => v.muted = isMute);
+            document.getElementById('m-icon').className = isMute ? "fas fa-volume-mute" : "fas fa-volume-up";
         }
 
-        function nextSlide() {
-            engine.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
-        }
-
-        // Digital Clock System
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('digital-clock').innerText = 
-                now.getHours().toString().padStart(2, '0') + ":" + 
-                now.getMinutes().toString().padStart(2, '0') + ":" + 
-                now.getSeconds().toString().padStart(2, '0') + " // SYSTEM_ACTIVE";
-        }, 1000);
-
-        // Loading Screen Logic
-        window.addEventListener('load', () => {
-            const fill = document.getElementById('loading-fill');
-            fill.style.width = '100%';
+        window.onload = () => {
+            document.getElementById('p-bar').style.width = '100%';
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
-            }, 1500);
-        });
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 800);
+            }, 1000);
+        };
     </script>
 </body>
 </html>
